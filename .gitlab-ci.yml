@@ -1,0 +1,13 @@
+stages:
+  - test
+
+image: golang
+
+test:
+  stage: test
+  tags:
+    - docker
+  script:
+    - apt update
+    - apt install jq -y
+    - make test-rules

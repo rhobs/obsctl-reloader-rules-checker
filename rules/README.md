@@ -6,6 +6,16 @@ Files in each folder have to be:
 - You can name the files as you want; however a good practice is to specify the object type before the extension  
   So the filenames should end with the `.prometheusrule.yaml` suffix.
 
+# Test rules
+
+Put tests into `test/rules/<TENANT>` directory.
+You can validate and unit test alerts and recording rules with 
+`make test-rules`. 
+
+https://prometheus.io/docs/prometheus/latest/configuration/unit_testing_rules/
+
+Running `make check-runbooks` will test alerts for broken runbook/SOP links.
+
 # Registering a new tenant
 
 You have to register each folder in `app-interface` repository as follows:

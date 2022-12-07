@@ -17,7 +17,7 @@ PROMTOOL_BIN=$(BIN_DIR)/promtool
 TOOLING=$(GOJSONTOYAML_BIN) $(PROMTOOL_BIN)
 
 .PHONY: all
-all: clean test-rules check-runbooks
+all: clean test-rules
 
 .PHONY: clean
 clean:
@@ -40,13 +40,6 @@ test-rules: check-tooling check-rules
 
 .PHONY: check-tooling
 check-tooling: $(TOOLING)
-
-.PHONY: check-runbooks
-check-runbooks:
-	# Get runbook urls from the alerts annotations and test if a link is broken
-	# with wget. It also make sure that the command succeed when there are no urls.
-	# Broken runbook links:
-	@grep -rho 'runbook_url.*' rules || true | cut -f2- -d: | wget --spider -nv -i -
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)

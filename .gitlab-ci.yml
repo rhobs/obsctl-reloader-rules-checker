@@ -10,4 +10,4 @@ test:
   script:
     - apt update
     - apt install jq -y
-    - make test-rules
+    - make test

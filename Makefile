@@ -17,11 +17,22 @@ PROMTOOL_BIN=$(BIN_DIR)/promtool
 TOOLING=$(GOJSONTOYAML_BIN) $(PROMTOOL_BIN)
 
 .PHONY: all
-all: clean test-rules
+all: clean gen-rules-templates test-rules
+
+.PHONY: test
+test: check-rules-templates test-rules
 
 .PHONY: clean
 clean:
 	rm -rf tmp
+
+.PHONY: gen-rules-templates
+gen-rules-templates: check-tooling
+	hack/gen-rules-template.sh hypershift-platform
+
+.PHONY: check-rules-templates
+check-rules-templates: gen-rules-templates
+	@git status -s | grep -q 'template\.yaml$$' && (echo 'Some generated templates are not committed:'; git status; exit 1) || true
 
 .PHONY: get-rules
 get-rules:

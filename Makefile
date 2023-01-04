@@ -32,7 +32,7 @@ gen-rules-templates: check-tooling
 
 .PHONY: check-rules-templates
 check-rules-templates: gen-rules-templates
-	@git status -s | grep -q 'template\.yaml$$' && (echo 'Some generated templates are not committed:'; git status; exit 1) || true
+	@! (git status -s | grep -q 'template\.yaml$$') || (echo 'Some generated templates are not committed:'; git status; exit 1)
 
 .PHONY: get-rules
 get-rules:

@@ -4,6 +4,8 @@ stages:
 image: golang
 
 test:
+  only:
+    - merge_requests
   stage: test
   tags:
     - docker

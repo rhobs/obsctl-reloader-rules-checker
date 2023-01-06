@@ -20,7 +20,6 @@
 package tools
 
 import (
-	_ "github.com/brancz/gojsontoyaml"
 	_ "github.com/mikefarah/yq/v4"
 	_ "github.com/prometheus/prometheus/cmd/promtool"
 )

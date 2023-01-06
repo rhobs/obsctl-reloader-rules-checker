@@ -17,40 +17,33 @@ PROMTOOL_BIN=$(BIN_DIR)/promtool
 TOOLING=$(GOJSONTOYAML_BIN) $(PROMTOOL_BIN)
 
 .PHONY: all
-all: clean gen-rules-templates test-rules
+all: clean gen-rules-templates check-rules test-rules
 
 .PHONY: test
-test: check-rules-templates test-rules
+test: check-rules test-rules check-rules-templates-are-committed
 
 .PHONY: clean
 clean:
 	rm -rf tmp
 
-.PHONY: gen-rules-templates
-gen-rules-templates: check-tooling
-	hack/gen-rules-template.sh hypershift-platform
-
-.PHONY: check-rules-templates
-check-rules-templates: gen-rules-templates
-	@! (git status -s | grep -q 'template\.yaml$$') || (echo 'Some generated templates are not committed:'; git status; exit 1)
-
-.PHONY: get-rules
-get-rules:
-	mkdir -p tmp/rules
-	rm -f tmp/rules.yaml
-	hack/find-rules.sh | $(GOJSONTOYAML_BIN) > tmp/rules.yaml
-
 .PHONY: check-rules
-check-rules: get-rules
-	rm -f tmp/"$@".out
-	@$(PROMTOOL_BIN) check rules tmp/rules.yaml | tee "tmp/$@.out"
+check-rules: get-tooling
+	hack/check-rules.sh | tee "tmp/$@.out"
 
 .PHONY: test-rules
-test-rules: check-tooling check-rules
+test-rules: get-tooling
 	hack/test-rules.sh | tee "tmp/$@.out"
 
-.PHONY: check-tooling
-check-tooling: $(TOOLING)
+.PHONY: gen-rules-templates
+gen-rules-templates: get-tooling
+	hack/gen-rules-template.sh hypershift-platform
+
+.PHONY: check-rules-templates-are-committed
+check-rules-templates-are-committed: gen-rules-templates
+	@! (git status -s | grep -q 'template\.yaml$$') || (echo 'Some generated templates are not committed:'; git status; exit 1)
+
+.PHONY: get-tooling
+get-tooling: $(TOOLING)
 
 $(BIN_DIR):
 	mkdir -p $(BIN_DIR)

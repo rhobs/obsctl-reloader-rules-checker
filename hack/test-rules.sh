@@ -1,16 +1,24 @@
 #!/usr/bin/env bash
 set -e
-# only exit with zero if all commands of the pipeline exit successfully
 set -o pipefail
 
+root_path="$(dirname $BASH_SOURCE)/.."
+cd "$root_path"
+
 # Ensure that we use the binaries from the versions defined in hack/tools/go.mod.
-PATH="$(pwd)/tmp/bin:${PATH}"
+PATH="tmp/bin:${PATH}"
 
-TMP_RULE_FILE=$(mktemp tmp/tmp.XXXXXXXXXX.yaml)
-trap 'rm -f "$TMP_RULE_FILE"' EXIT
+playground_path=tmp/test-rules
+mkdir -p "$playground_path"
 
-for rule in ./test/rules/hypershift-platform/*.yaml; do
-	echo ">> testing $rule <<";
-	gojsontoyaml -yamltojson - < "$rule" | jq '.rule_files=["rules.yaml"]' | gojsontoyaml - > "$TMP_RULE_FILE"
-	promtool test rules "$TMP_RULE_FILE"
+for test_path in test/rules/*/*.yaml; do
+	echo ">> running $test_path <<"
+	rm -fr "$playground_path"/*
+	cp "$test_path" "$playground_path"
+	tenant="$(basename "$(dirname "$test_path")")"
+	yq .rule_files "$test_path" | while read rules_files_item; do
+		rule_file_name="$(echo "$rules_files_item" | sed 's/^- //g')"
+		yq .spec "rules/$tenant/$rule_file_name" >| "$playground_path/$rule_file_name"
+	done
+	promtool test rules "$playground_path/$(basename "$test_path")"
 done

@@ -10,7 +10,7 @@ PATH="tmp/bin:${PATH}"
 playground_path=tmp/check-rules
 mkdir -p "$playground_path"
 
-find rules/hypershift-platform -type f -name '*.yaml' | while read rules_path; do
+for rules_path in rules/*/*.yaml; do
     if [ $(yq .kind "$rules_path") = PrometheusRule ]; then
         echo ">> checking $rules_path <<"
         name="$(yq .metadata.name "$rules_path")"

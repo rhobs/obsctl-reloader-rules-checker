@@ -12,9 +12,9 @@ export GOPROXY
 
 BIN_DIR ?= $(shell pwd)/tmp/bin
 
-GOJSONTOYAML_BIN=$(BIN_DIR)/gojsontoyaml
+YQ_BIN=$(BIN_DIR)/yq
 PROMTOOL_BIN=$(BIN_DIR)/promtool
-TOOLING=$(GOJSONTOYAML_BIN) $(PROMTOOL_BIN)
+TOOLING=$(YQ_BIN) $(PROMTOOL_BIN)
 
 .PHONY: all
 all: clean gen-rules-templates check-rules test-rules yaml-lint

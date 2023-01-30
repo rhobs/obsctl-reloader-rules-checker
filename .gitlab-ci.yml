@@ -11,6 +11,5 @@ test:
     - docker
   script:
     - apt update
-    - apt install jq -y
     - apt install yamllint -y
     - make test

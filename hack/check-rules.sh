@@ -2,7 +2,7 @@
 set -e
 set -o pipefail
 
-root_path="$(dirname $BASH_SOURCE)/.."
+cd "$(dirname $BASH_SOURCE)/.."
 
 # Ensure that we use the binaries from the versions defined in hack/tools/go.mod.
 PATH="tmp/bin:${PATH}"

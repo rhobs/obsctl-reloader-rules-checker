@@ -10,11 +10,8 @@ GOPROXY?=http://proxy.golang.org
 export GO111MODULE
 export GOPROXY
 
-BIN_DIR ?= $(shell pwd)/tmp/bin
-
-YQ_BIN=$(BIN_DIR)/yq
-PROMTOOL_BIN=$(BIN_DIR)/promtool
-TOOLING=$(YQ_BIN) $(PROMTOOL_BIN)
+TOOLS_DIR ?= $(shell pwd)/tmp/bin
+TOOLS_BIN=$(TOOLS_DIR)/yq $(TOOLS_DIR)/promtool
 
 .PHONY: all
 all: clean gen-rules-templates check-rules test-rules yaml-lint
@@ -34,6 +31,10 @@ check-rules: get-tooling
 test-rules: get-tooling
 	hack/test-rules.sh | tee "tmp/$@.out"
 
+.PHONY: test-changed-rules
+test-changed-rules: get-tooling
+	hack/test-changed-rules.sh | tee "tmp/$@.out"
+
 .PHONY: gen-rules-templates
 gen-rules-templates: get-tooling
 	hack/gen-rules-template.sh hypershift-platform
@@ -43,14 +44,15 @@ check-rules-templates-are-committed: gen-rules-templates
 	@! (git status -s | grep -q 'template\.yaml$$') || (echo 'Some generated templates are not committed:'; git status; exit 1)
 
 .PHONY: get-tooling
-get-tooling: $(TOOLING)
+get-tooling: $(TOOLS_BIN)
 
-$(BIN_DIR):
-	mkdir -p $(BIN_DIR)
+$(TOOLS_DIR):
+	mkdir -p $(TOOLS_DIR)
 
-$(TOOLING): $(BIN_DIR)
+
+$(TOOLS_BIN): $(TOOLS_DIR)
 	@echo Installing tools from hack/tools.go
-	@cd hack/tools && go list -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(BIN_DIR) %
+	@cd hack/tools && go list -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(TOOLS_DIR) %
 
 .PHONY: yaml-lint
 yaml-lint:

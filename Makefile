@@ -17,10 +17,10 @@ PROMTOOL_BIN=$(BIN_DIR)/promtool
 TOOLING=$(GOJSONTOYAML_BIN) $(PROMTOOL_BIN)
 
 .PHONY: all
-all: clean gen-rules-templates check-rules test-rules
+all: clean gen-rules-templates check-rules test-rules yaml-lint
 
 .PHONY: test
-test: check-rules test-rules check-rules-templates-are-committed
+test: check-rules test-rules yaml-lint check-rules-templates-are-committed
 
 .PHONY: clean
 clean:
@@ -51,3 +51,8 @@ $(BIN_DIR):
 $(TOOLING): $(BIN_DIR)
 	@echo Installing tools from hack/tools.go
 	@cd hack/tools && go list -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(BIN_DIR) %
+
+.PHONY: yaml-lint
+yaml-lint:
+	@echo Linting yaml files in rules/ and test/
+	hack/yaml-lint.sh

@@ -3,6 +3,9 @@ SHELL=/usr/bin/env bash -o pipefail
 TAG?=$(shell git rev-parse --short HEAD)
 VERSION=$(shell cat VERSION | tr -d " \t\n\r")
 
+NO_INSTALL ?= 0
+export NO_INSTALL
+
 GOOS?=$(shell go env GOOS)
 GOARCH?=$(shell go env GOARCH)
 GO111MODULE?=auto
@@ -52,7 +55,7 @@ $(TOOLS_DIR):
 
 $(TOOLS_BIN): $(TOOLS_DIR)
 	@echo Installing tools from hack/tools.go
-	@cd hack/tools && go list -mod=mod -tags tools -f '{{ range .Imports }}{{ printf "%s\n" .}}{{end}}' ./ | xargs -tI % go build -mod=mod -o $(TOOLS_DIR) %
+	@hack/install-tools.sh
 
 .PHONY: yaml-lint
 yaml-lint:

@@ -2,6 +2,7 @@ module github.com/openshift/rhobs-rules-and-dashboards/hack
 
 go 1.19
 
+// The 2 below versions are also read by .gitlab-ci.yml file at the root of the clone
 require (
 	github.com/mikefarah/yq/v4 v4.30.6
 	github.com/prometheus/prometheus v0.41.0

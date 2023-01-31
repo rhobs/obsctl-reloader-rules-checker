@@ -4,8 +4,8 @@ set -o pipefail
 
 # This script concatenates the yaml files found in a rules directory given by the tenant parameter.
 
-root_path="$(dirname $BASH_SOURCE)/.."
-dir_path="$root_path/rules/$1"
+cd "$(dirname $BASH_SOURCE)/.."
+dir_path="rules/$1"
 
 if [ "$#" -ne 1 ] || ! [ -d "$dir_path" ]; then
     echo "Usage: $BASH_SOURCE TENANT" >&2
@@ -15,7 +15,7 @@ fi
 template_path="$dir_path/template.yaml"
 
 # Ensure that we use the binaries from the versions defined in hack/tools/go.mod.
-PATH="$root_path/tmp/bin:${PATH}"
+PATH="tmp/bin:${PATH}"
 
 cat <<EOF >| "$template_path"
 # THIS FILE IS GENERATED FROM THE RULES FILES IN THE FOLDER

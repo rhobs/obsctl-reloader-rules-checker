@@ -12,4 +12,16 @@ test:
   script:
     - apt update
     - apt install yamllint -y
-    - make test
+    - |
+      VERSION=`grep -F 'github.com/prometheus/prometheus' hack/tools/go.mod | sed 's@^.*prometheus *@@g' | sed 's/^v0/2/g'`
+      mkdir tmp && cd tmp
+      wget "https://github.com/prometheus/prometheus/releases/download/v${VERSION}/prometheus-${VERSION}.linux-amd64.tar.gz" -O - | tar xz
+      mv "prometheus-${VERSION}.linux-amd64/promtool" /usr/bin/
+      cd .. && rm -fr tmp
+    - |
+      VERSION=`grep -F 'github.com/mikefarah/yq/v4' hack/tools/go.mod | sed -r 's@^.*yq/v4 *v?@@g'`
+      mkdir tmp && cd tmp
+      wget "https://github.com/mikefarah/yq/releases/download/v${VERSION}/yq_linux_amd64.tar.gz" -O - | tar xz
+      mv yq_linux_amd64 /usr/bin/yq
+      cd .. && rm -fr tmp
+    - NO_INSTALL=1 make test

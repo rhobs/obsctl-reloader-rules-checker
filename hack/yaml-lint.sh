@@ -2,11 +2,8 @@
 set -e
 set -o pipefail
 
-root_path="$(dirname $BASH_SOURCE)/.."
-rules_path="$root_path/rules/"
-test_path="$root_path/test/"
+cd "$(dirname $BASH_SOURCE)/.."
 
-for file in "$rules_path*/*.yaml" "$test_path*/*/*.yaml"; do 
+for file in "./**/*.yaml"; do
    yamllint $file
 done
-

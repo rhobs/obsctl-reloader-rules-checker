@@ -1,3 +1,5 @@
+TODO: refactor this doc
+
 # One folder per targeted RHOBS tenant
 
 Files in each folder have to be:

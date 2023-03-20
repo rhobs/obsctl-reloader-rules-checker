@@ -72,7 +72,7 @@ make gen-rules-templates
 
 Take a look at the [documentation](docs).
 
-More specifically, you may want to take a look at the following documents when dealing with rules:
+More specifically, you may want to take a look at the following documents when dealing with rules and Hypershift in mind:
 - [An introduction to the Hypershift monitoring architecture](docs/rules/hypershift-monitoring-architecture-introduction.md)
 - [Designing rules and writing tests](docs/rules/designing-rules-and-writing-tests.md)
 - [Troubleshooting the deployment pipeline](docs/rules/troubleshooting-the-deployment-pipeline.md)

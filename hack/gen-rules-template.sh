@@ -2,13 +2,13 @@
 set -e
 set -o pipefail
 
-# This script concatenates the yaml files found in a rules directory given by the tenant parameter.
+# This script generates a template which concatenates the yaml files found in a rules folder.
 
 cd "$(dirname $BASH_SOURCE)/.."
 dir_path="rules/$1"
 
 if [ "$#" -ne 1 ] || ! [ -d "$dir_path" ]; then
-    echo "Usage: $BASH_SOURCE TENANT" >&2
+    echo "Usage: $BASH_SOURCE RULES_FOLDER" >&2
     exit 1
 fi
 
@@ -34,7 +34,7 @@ parameters:
 objects: []
 EOF
 
-find "rules/$1" -type f -name '*.yaml' | sort | while read rules_path; do
+find "$dir_path" -type f -name '*.yaml' | sort | while read rules_path; do
     if [ $(yq .kind "$rules_path") = PrometheusRule ]; then
         yq -i ".objects += $(cat "$rules_path" | yq 'to_json(0)' | sed 's/\\n/\n/g')" "$template_path"
         yq -i '.objects[-1].metadata.name = "${TENANT}-" + .objects[-1].metadata.name' "$template_path"

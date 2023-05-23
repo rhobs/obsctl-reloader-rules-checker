@@ -26,10 +26,10 @@ rm -fr "$playground_path"
 mkdir -p "$playground_path"
 
 cp "$test_path" "$playground_path"
-tenant="$(basename "$(dirname "$test_path")")"
+rules_folder_name="$(basename "$(dirname "$test_path")")"
 yq .rule_files "$test_path" | while read rules_files_item; do
     rule_file_name="$(echo "$rules_files_item" | sed 's/^- //g')"
-    yq .spec "rules/$tenant/$rule_file_name" >| "$playground_path/$rule_file_name"
+    yq .spec "rules/$rules_folder_name/$rule_file_name" >| "$playground_path/$rule_file_name"
 done
 
 promtool test rules "$playground_path/$(basename "$test_path")"

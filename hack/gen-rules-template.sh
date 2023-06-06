@@ -34,7 +34,7 @@ parameters:
 objects: []
 EOF
 
-find "$dir_path" -type f -name '*.yaml' | sort | while read rules_path; do
+find "$dir_path" -type f -name '*.yaml' | LC_COLLATE=C sort | while read rules_path; do
     if [ $(yq .kind "$rules_path") = PrometheusRule ]; then
         yq -i ".objects += $(cat "$rules_path" | yq 'to_json(0)' | sed 's/\\n/\n/g')" "$template_path"
         yq -i '.objects[-1].metadata.name = "${TENANT}-" + .objects[-1].metadata.name' "$template_path"

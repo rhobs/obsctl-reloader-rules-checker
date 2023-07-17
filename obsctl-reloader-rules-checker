@@ -1,0 +1,39 @@
+#!/usr/bin/env bash
+set -e
+
+has_printed=false
+
+if [ "$#" -eq 1 ] && ([ "$1" = '-h' ] || [ "$1" = '--help' ]); then
+    echo "You are invoking the '$(basename "$0")' wrapper"
+    echo "This wrapper makes sure that:"
+    echo "- The wrapped binary is built"
+    echo "- 'yamllint' is installed if possible"
+    echo "- 'promtool' is (locally) built and used by the wrapped binary"
+    has_printed=true
+fi
+
+cd "$(dirname $BASH_SOURCE)"
+bin_path="$PWD/bin"
+
+if !(yamllint --version 2>&1 > /dev/null); then
+    echo "-> Installing 'yamllint' as it is not yet installed..."
+    make yamllint-tool || {
+        echo "Failed to install 'yamllint'; it won't be possible to use the --yaml-lint option!"
+    }
+    has_printed=true
+fi
+
+if ! [ -x "$bin_path/obsctl-reloader-rules-checker" ]; then
+    echo "-> Wrapped binary does not yet exist; building it alongside with 'promtool'..."
+    NO_GO_TOOLS_BUILD=0 make build
+    has_printed=true
+fi
+
+if $has_printed; then
+    echo
+    echo "Below is the ouput of the wrapped binary"
+    printf -- '-%.0s' {1..80}
+    echo
+fi
+
+PATH="$bin_path:$PATH" ./bin/obsctl-reloader-rules-checker "$@"

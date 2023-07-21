@@ -1,0 +1,49 @@
+#!/usr/bin/env bash
+set -e
+set -o pipefail
+
+cd "$(dirname $BASH_SOURCE)"
+
+code_bin="bin/$0"
+has_printed=false
+
+if [ "$#" -eq 1 ] && ([ "$1" = '-h' ] || [ "$1" = '--help' ]); then
+    echo "You are invoking the '$(basename "$0")' wrapper"
+    echo "This wrapper makes sure that:"
+    echo "- The wrapped binary is built"
+    echo "- Go tools ('promtool') are installed"
+    echo "- 'yamllint' is installed if possible"
+    has_printed=true
+fi
+
+if !(command -v promtool >/dev/null); then
+    make go-tools
+    has_printed=true
+fi
+
+if !(command -v yamllint >/dev/null); then
+    echo "-> Installing 'yamllint' as it is not yet installed..."
+    make yamllint-tool || {
+        echo "Failed to install 'yamllint'; it won't be possible to use the --yaml-lint option!"
+    }
+    has_printed=true
+fi
+
+make_ouput=`mktemp`
+make build | (grep -v '^make: Nothing to be done' || true) | tee "$make_ouput"
+echo "YOLA"
+if [ -s "$make_ouput" ]; then
+    has_printed=true
+fi
+
+rm -f "$make_ouput"
+
+if $has_printed; then
+    echo
+    echo "Above is the output of the wrapper"
+    echo "Below is the output of the wrapped binary"
+    printf -- '-%.0s' {1..80}
+    echo
+fi
+
+"$code_bin" "$@"

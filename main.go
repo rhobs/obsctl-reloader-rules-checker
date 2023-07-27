@@ -331,14 +331,16 @@ func lintFiles(rulesDirPath, testsDirPath string) {
 			return lintFile(path)
 		})
 
-	visitDir(testsDirPath, true,
-		func(isDir bool, path string) error {
-			if isDir || !isNamedAsAUnitTest(path) {
-				return errSkipped
-			}
+	if testsDirPath != "" {
+		visitDir(testsDirPath, true,
+			func(isDir bool, path string) error {
+				if isDir || !isNamedAsAUnitTest(path) {
+					return errSkipped
+				}
 
-			return lintFile(path)
-		})
+				return lintFile(path)
+			})
+	}
 }
 
 const templateHeaderFormat = `

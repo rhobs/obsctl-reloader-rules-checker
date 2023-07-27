@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+# Wrapper that will resolve to podman if it is installed
+# Used by goreleaser which hardcodes the use of docker and which is unable to resolve
+# the container engine to use on the fly. 
+
+"${CONTAINER_ENGINE:-$(command -v podman 2>/dev/null || echo docker)}" $@

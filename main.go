@@ -17,6 +17,8 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var version = "dev"
+
 const objectNamePattern = "[a-z0-9]([-a-z0-9]*[a-z0-9])?"
 const promRuleAPIVersion = "monitoring.coreos.com/v1"
 const promRuleKind = "PrometheusRule"
@@ -608,8 +610,9 @@ func main() {
 	var isRunningLinter, isExpectingCommittedTemplate bool
 
 	rootCmd := &cobra.Command{
-		Use:  filepath.Base(os.Args[0]),
-		Long: longDesc,
+		Use:     filepath.Base(os.Args[0]),
+		Long:    longDesc,
+		Version: version,
 		Run: func(cmd *cobra.Command, args []string) {
 			exitOnErroneousUsage := func() {
 				err := cmd.Usage()

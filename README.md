@@ -17,11 +17,14 @@ The `obsctl-reloader-rules-checker` tool relies on the following command line to
   It is used to check that input files really store `PrometheusRule` objects; the tool is also used to run the rules unittests.
 - [`yamllint`](https://github.com/adrienverge/yamllint): this tool is a linter (so a nice to have) used both on the rules and the unittests.  
   It only need to be present if you plan on using the `-y` flag of `obsctl-reloader-rules-checker`.
+- [`pint`](https://github.com/cloudflare/pint/tree/main): this tool is an other linter which is aimed a tackling `PrometheusRule` objects.  
+  Again installing it is optional as its use is conditioned by the `-p` flag.
+
 
 You have to make sure that those tool are present on your computer when using the `obsctl-reloader-rules-checker` tool binary.
 
 Take a look at the following files to know the versions of those tools to use:
-- For `promtool`: [`hack/install-go-tools.sh`](./hack/install-go-tools.sh)
+- For `promtool` & `pint`: [`hack/install-go-tools.sh`](./hack/install-go-tools.sh)
 - For `yamllint`: [`hack/install-yamllint-tool.sh`](./hack/install-yamllint-tool.sh)
 
 ## Using the tool docker image instead
@@ -31,7 +34,7 @@ A docker image wrapping the tool is delivered on [quay](https://quay.io/reposito
 quay.io/rhobs/obsctl-reloader-rules-checker:latest
 ```
 
-**This is actually the preferred way of using the tool as the image contains the `promtool` and `yamllint` dependencies.**
+**This is actually the preferred way of using the tool as the image contains the `promtool`, `pint` and `yamllint` dependencies.**
 
 The only prerequisite before using the docker image is to have a container engine (`docker`, `podman`) installed on your computer.
 
@@ -43,7 +46,7 @@ The [`obsctl-reloader-rules-checker`](./obsctl-reloader-rules-checker) file at t
 
 It accepts the exact same arguments than the tool binary and make sure that:
 - The wrapped tool binary is built
-- `promtool` and `yamllint` are installed
+- `promtool`, `pint` and `yamllint` are installed
 
 This allows using the tool out of the box without understanding how to build or locally work on it (see [local developement](#local-developement)).
 However this script is not standalone and you have to clone the repository to use it.
@@ -108,6 +111,7 @@ Once again, the `-h` / `--help` flag is pretty explicit about those checks. Here
 - Check that the objects names and `tenant` label are properly set.
 - Run all the unittests with `promtool test rules`.
 - Run `yamllint` on the rule files and the unittests.
+- Run `pint` on the `spec` part of the `PrometheusRule` objects.
 
 ## Building the tool binary
 
@@ -122,7 +126,7 @@ To build the binary you just have to run:
 make build
 ```
 
-The binary will be delivered in the `bin` folder. `promtool` is also built and installed when running that command.
+The binary will be delivered in the `bin` folder. `promtool` & `pint` are also built and installed when running that command.
 
 ## Building the tool docker image
 
@@ -177,7 +181,7 @@ The difference between the 2 commands are that:
 ```
 make clean
 ```
-This will remove the `bin` folder in which the tool binary has been delivered but also the `.bingo` folder which was used to build `promtool`.
+This will remove the `bin` folder in which the tool binary has been delivered but also the `.bingo` folder which was used to build `promtool` & `pint`.
 
 ## Delivering the code
 

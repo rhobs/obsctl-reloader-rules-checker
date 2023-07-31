@@ -12,4 +12,5 @@ cd "$(dirname $BASH_SOURCE)/.."
 go install -mod=readonly github.com/bwplotka/bingo@latest
 
 unset GOFLAGS
-bingo get --v -l github.com/prometheus/prometheus/cmd/promtool@v0.41.0
+bingo get -v -l github.com/prometheus/prometheus/cmd/promtool@v0.41.0
+bingo get -v -l github.com/cloudflare/pint/cmd/pint@v0.44.1

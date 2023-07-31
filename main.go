@@ -348,7 +348,7 @@ THIS FILE IS GENERATED FROM THE FILES IN THE %s FOLDER
 Do not edit it manually!
 
 Generate it again by running the following command%s:
-docker run -v "$(pwd):/work" quay.io/rhobs/obsctl-reloader-rules-checker:latest -t %s %s
+docker run -v "$(pwd):/work" -t --privileged quay.io/rhobs/obsctl-reloader-rules-checker:%v -t %s %s
 
 -> Eventually replace the 'docker' container engine by the engine installed on
    your computer (for instance: 'podman').
@@ -357,13 +357,13 @@ docker run -v "$(pwd):/work" quay.io/rhobs/obsctl-reloader-rules-checker:latest 
    the image locally:
    localhost/obsctl-reloader-rules-checker:latest
 -> Eventually replace everything that precedes the '-t' option by the path to
-   tool in case you have the tool installed or built locally on your computer. 
+   tool in case you have the tool installed or built locally on your computer.
 
 If your Makefile supports it, you should also be able to generate this file
 again by running one of those commands at the root of your rules repository
 clone:
 - make
-- make gen-template
+- make checks
 
 You can find more information on the tool used underneath by taking a look at
 its repository:
@@ -423,11 +423,12 @@ func generateTemplate(rulesDirPath, tenant, templatePath string) {
 			tmplNode.HeadComment = fmt.Sprintf(templateHeaderFormat,
 				"'"+rulesRelPath+"'",
 				" at the root of your clone",
+				version,
 				quotedTenant,
 				fmt.Sprintf("-d '%s' -t '%s'", rulesRelPath, tmplRelPath),
 			)
 		} else {
-			tmplNode.HeadComment = fmt.Sprintf(templateHeaderFormat, "RULE", "", quotedTenant, "...")
+			tmplNode.HeadComment = fmt.Sprintf(templateHeaderFormat, "RULE", "", version, quotedTenant, "...")
 		}
 	}
 

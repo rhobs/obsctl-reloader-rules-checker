@@ -18,6 +18,7 @@ RUN python3 -m ensurepip --upgrade
 RUN ./install-yamllint-tool.sh
 
 COPY --from=builder /go/bin/promtool /usr/bin/
+COPY --from=builder /go/bin/pint /usr/bin/
 COPY --from=builder /work/bin/obsctl-reloader-rules-checker /usr/bin/
 
 WORKDIR /work

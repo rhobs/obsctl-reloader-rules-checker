@@ -373,7 +373,7 @@ THIS FILE IS GENERATED FROM THE FILES IN THE %s FOLDER
 Do not edit it manually!
 
 Generate it again by running the following command%s:
-docker run -v "$(pwd):/work" -t --privileged quay.io/rhobs/obsctl-reloader-rules-checker:%v -t %s %s
+docker run -v "$(pwd):/work" -t --rm --privileged quay.io/rhobs/obsctl-reloader-rules-checker:%v -t %s %s
 
 -> Eventually replace the 'docker' container engine by the engine installed on
    your computer (for instance: 'podman').
@@ -450,7 +450,7 @@ func generateTemplate(rulesDirPath, tenant, templatePath string) {
 				" at the root of your clone",
 				version,
 				quotedTenant,
-				fmt.Sprintf("-d '%s' -t '%s'", rulesRelPath, tmplRelPath),
+				fmt.Sprintf("-d '%s' -g '%s'", rulesRelPath, tmplRelPath),
 			)
 		} else {
 			tmplNode.HeadComment = fmt.Sprintf(templateHeaderFormat, "RULE", "", version, quotedTenant, "...")

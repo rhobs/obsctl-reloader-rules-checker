@@ -94,7 +94,7 @@ Now lets explain the flags used in above example:
   The value passed here is just used as a default value for the template `TENANT` parameter.
 - The `-d` flag locates the directory in which the rules are located.
 - The `-g` flag tells to generate a template and gives the path to the file to generate.
-- The `-t` flag gives the path to the unittests directory.
+- The `-T` flag gives the path to the unittests directory.
 - The `-y` flag tells to run `yamllint` on all the rule files and on all the unittests.  
   Remark that the `.yamllint` at the root of the clone repository is telling how those YAML files should be formatted. This file is optional when using the docker image; indeed the tool docker image is bundling a default `yamllint` config file defined [there](./.yamllint).
 

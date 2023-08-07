@@ -183,6 +183,37 @@ make clean
 ```
 This will remove the `bin` folder in which the tool binary has been delivered but also the `.bingo` folder which was used to build `promtool` & `pint`.
 
+## Contributing
+
+You have to perform the following checks prior sending your code in a PR:
+- Run `make pr-checks`: this will build the code and make sure it passes all linters.  
+  More details on that in [the previous section](#local-developement).
+- Make sure your commit messages follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/#summary) as this will be checked by the CI.  
+  You can check that locally by installing a hook on your repository clone; see below.
+
+**Installing a hook to check commit messages**:
+- Install `pre-commit` tool if not already done.  
+  This is platform specific, refer to the [tool documentation](https://pre-commit.com/#installation) for instructions.
+- Run the following command:  
+  ```
+  pre-commit install --hook-type commit-msg
+  ```
+
+The hook is only installed on your repository clone.
+You my want to remove it when performing some advanced operations, see below instructions. 
+
+**Uninstalling the hook checking commit messages**:
+- Run the following command:
+  ```
+  pre-commit uninstall --hook-type commit-msg
+  ```
+- Or just:
+  ```
+  rm .git/hooks/commit-msg
+  ```
+
+
+
 ## Delivering the code
 
 Just tag your local clone and push the tag without going through a pull request:

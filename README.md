@@ -38,7 +38,7 @@ quay.io/rhobs/obsctl-reloader-rules-checker:latest
 
 The only prerequisite before using the docker image is to have a container engine (`docker`, `podman`) installed on your computer.
 
-This image can also be used on GitHub and GitLab continuous integrations to assess the corectness of your pull requests and merge requests on rules repositories. More on that later.
+This image can also be used on GitHub and GitLab continuous integrations to assess the correctness of your pull requests and merge requests on rules repositories. More on that later.
 
 ## Using the binary wrapper
 
@@ -48,7 +48,7 @@ It accepts the exact same arguments than the tool binary and make sure that:
 - The wrapped tool binary is built
 - `promtool`, `pint` and `yamllint` are installed
 
-This allows using the tool out of the box without understanding how to build or locally work on it (see [local developement](#local-developement)).
+This allows using the tool out of the box without understanding how to build or locally work on it (see [local development](#local-development)).
 However this script is not standalone and you have to clone the repository to use it.
 
 ## Tool usage
@@ -77,11 +77,11 @@ As this tenant may differ a bit between prod and staging, we are gonna call the 
 Let's assume that you are at the root of the clone; you will have to call the tool as follows on Linux/Mac:
 - When using the tool binary:
   ```
-  obsctl-reloader-rules-checker -t my-tenant -d rules -g template/template.yaml -t tests -y
+  obsctl-reloader-rules-checker -t my-tenant -d rules -g template/template.yaml -T tests -y
   ```
 - When using the tool docker image:
   ```
-  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template/template.yaml -t tests -y
+  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template/template.yaml -T tests -y
   ```
   (replace `docker` container engine by `podman` if needed)
 
@@ -91,7 +91,7 @@ Now lets explain the flags used in above example:
 - The `-t` flag is used to specify the rules tenant.  
   The tenant is a string used by RHOBS to partition / shard data.  
   As previously said, we are not yet sure of the tenant on which the rules will be uploaded and that's why we are generating a template.  
-  The value passed here is just used as a default value for the temaple `TENANT` parameter.
+  The value passed here is just used as a default value for the template `TENANT` parameter.
 - The `-d` flag locates the directory in which the rules are located.
 - The `-g` flag tells to generate a template and gives the path to the file to generate.
 - The `-t` flag gives the path to the unittests directory.
@@ -146,9 +146,9 @@ The docker image will be tagged as follows is your local registry:
 obsctl-reloader-rules-checker:latest
 ```
 
-## Local developement
+## Local development
 
-Local development is not just about building the code. It is also about making sure that your changes will pass all the checks performed by the continous integration (CI) jobs.
+Local development is not just about building the code. It is also about making sure that your changes will pass all the checks performed by the continuous integration (CI) jobs.
 
 **Prerequisites**:
 - You have to checkout the code.
@@ -173,7 +173,7 @@ make pr-checks
 
 The difference between the 2 commands are that:
 - `make` builds the tool binary while `make pr-checks` build the tool docker image.  
-  Building the code outside a docker image is faster as `go` can benefit some  caching when buliding locally.
+  Building the code outside a docker image is faster as `go` can benefit some  caching when building locally.
 - `make` will format the code and update `go.mod` and `go.sum` files if needed; you will need to commit those files alongside with your change.  
   `make pr-checks` also updates those files but fails if the differs from what is committed.
 

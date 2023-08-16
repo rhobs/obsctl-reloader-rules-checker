@@ -57,9 +57,10 @@ This tool is used to assess the validity of rule files.
 Imagine you have a repository containing rules definitions structured as follows:
 
 ```
-my-tenant_repo_clone/
-├── .yamllint
+my-tenant-rhobs-rules-clone/
 ├── .git/
+├── .yamllint
+├── Makefile
 ├── rules/
 │   ├── rule1.yaml
 │   ├── rule2.yaml
@@ -67,21 +68,21 @@ my-tenant_repo_clone/
 ├── tests/
 │   ├── test1.yaml
 │   └── test2.yaml
-└── template/
+└── template.yaml
 ```
 
-This repository only contains the rules for a single RHOBS tenant, this tenant is named `my-tenant` in above example.
+In this example the repository contains the rules for the tenant named `my-tenant`.
 
 As this tenant may differ a bit between prod and staging, we are gonna call the tool in such a way that it will generate a template; the template gather all the rules and allows to define the exact tenant through the `TENANT` parameter when instantiated.
 
 Let's assume that you are at the root of the clone; you will have to call the tool as follows on Linux/Mac:
 - When using the tool binary:
   ```
-  obsctl-reloader-rules-checker -t my-tenant -d rules -g template/template.yaml -T tests -y
+  obsctl-reloader-rules-checker -t my-tenant -d rules -g template.yaml -T tests -y
   ```
 - When using the tool docker image:
   ```
-  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template/template.yaml -T tests -y
+  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template.yaml -T tests -y
   ```
   (replace `docker` container engine by `podman` if needed)
 

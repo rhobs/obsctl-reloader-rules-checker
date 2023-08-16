@@ -1,48 +1,64 @@
-## Folders and tenants
+# Rule repositories
 
-Two possibilities for each folder:
-- The folder targets only one RHOBS tenant.
-  - In that case the folder should be named after the tenant.
-- The folder targets several tenants:
-  - Those tenants are normally used for the same purpose but on different environments.
-    (ex: `hypershift-platform` and `hypershift-platform-staging` tenants)
-  - The common prefix of the tenants should normally be used to name the folder.
+The `obsctl-reloader-rules-checker` tool is designed to check the validity of a rule reposity.
 
-In all cases: a RHOBS tenant is only mapped by one folder.
+**A rule repository is a Git repository defining the Prometheus rules for a specific RHOBS tenant or for a set of related tenants.**
 
-## Inside each folder
-
-Each folder contains `.yaml` files. There are 2 kind of yaml files:
-- Files defining `PrometheusRule` objects.
-- And the `template.yaml` file aggregating those rules in just one file.
-
-The `template.yaml` is only present for multi tenant folders:
-- It overrides each  `PrometheusRule` with the value passed to its `TENANT` parameter:
-  - The name is prefixed with the passed tenant.
-  - The `tenant` label is set to be the passed tenant.
-- Rules are therefore only fully defined when instantiating the template with the targeted tenant.
-- This file is generated and should not much bother about it.  
-  Just follow the instructions in [the root `README.md`](../README.md#running-the-tests) to make sure the file is bundled in your merge request.
-
-For single tenant folders:
-- You have to set the `tenant` label for each `PrometheusRule` object yourself as there is no template doing it for you.
-- Similarly, you probably need to prefix the rule name with the tenant.  
-  Indeed rules might be deployed by `app-interface` on a location shared with other tenants... and prefixing the rule name with the tenant can help to avoid collisions there.
-
-## Testing rules
-
-Tests are located elsewhere: there are in the [`test/rules`](../test/rules/) directory.
-
-This directory follows the same structure than this directory:  
-Tests for a folder in this directory are located in a folder with the same name on the test directory.
-
-You can run the unit tests by shooting the following command at the root of your clone: 
+A rule repository is typically organized as follows:
 ```
-make
+tenant-rhobs-rules/
+├── .yamllint
+├── Makefile
+├── rules/
+│   ├── rule1.yaml
+│   ├── rule2.yaml
+│   └── rule3.yaml
+├── tests/
+│   ├── test1.yaml
+│   └── test2.yaml
+└── template.yaml
 ```
 
-## You want to know more?
+This is only a suggestion, the path to the rule files, unit tests or template can be adjusted.
 
-Take a look at:
-- [The root `README.md`](../README.md#running-the-tests) to know more about running the tests and generating or generating the rules templates.
-- [Adding a new rules folder](../docs/rules/adding-a-new-rules-folder.yaml)
+Also it is advised to name the rule repository after the tenant(s) it target.
+
+Once again this is not an obligation, here some known rule repositories and the RHOBS tenant(s) they target:
+
+| Rule repository  | Tenant(s) | Comment
+| ---------------- | --------- | -------
+| [`hypershift-platform-rhobs-rules`](https://gitlab.cee.redhat.com/service/hypershift-platform-rhobs-rules) | `hypershift-platform` for prod<br>`hypershift-platform-staging` for staging
+| [`osd-rhobs-rules-and-dashboards`](https://gitlab.cee.redhat.com/service/osd-rhobs-rules-and-dashboards) | `osd` for prod & staging | The repository also contains dashboards
+| [`redhat-appstudio/o11y`](https://github.com/redhat-appstudio/o11y) | `rhtap` for prod & staging
+
+## The [`resources`](./resources/) folder
+
+It contains the files you need to copy in the new rule repository to create. Namely:
+- The [`Makefile`](./resources/Makefile) (used for local devlopment)
+- The [`README.md`](./resources/README.md)
+- The CI files.
+
+Pay attention to the comments in those files; make sure your proceed to the following adjustement when copying them:
+- Replace `<tenant>` with the RHOBS tenant targeted by the new repository.  
+  If the rule repository is targeting several tenants: replace `<tenant>` with the "base" tenant which is either one of the tenants or with some prefix common to all targeted tenants.
+- Adapt sections tagged with `<adapt-if-template>` regarding whether or not you will generate a template for the rules in your new rule repository.  
+  As a reminder, a template:
+  - **Aggregates** all the Prometheus rules in a single object/file.
+  - **Is handy** in situations where you do not know in advance on what RHOBS tenant the rules will be deployed on.
+  - **Is required** when your rule repository targets several RHOBS tenants as the template lets you define the targeted tenant when it is instantiated.
+- Choose the right CI file to copy among the following possibilities:
+  - The [`.gitlab-ci.yaml`](./resources/.gitlab-ci.yaml) for GitLab CI
+  - The [`.github/workflows/pr-checks.yaml`](./resources/.github/workflows/pr-checks.yaml) for GitHub actions
+
+In case of doubt, take a look at the existing rules repositories listed earlier to know how to adjust the files to copy.
+
+## The [`docs`](./docs/) folder
+
+It contains documentation that applies to any rule repository:
+- [Creating a new rule repo](./creating-a-new-rule-repo.md): how to use `obsctl-reloader-rules-checker` for local testing & CI (Continuous Integration)
+- [Configuring rule repo deployment](./configuring-rule-repo-deployment.md): how to setup [`app-interface`](https://gitlab.cee.redhat.com/service/app-interface) automation to get the rules deployed on RHOBS.
+- Also you can find there documents explaining:
+  - How to debug the deployment process.
+  - How to design rules which be evaluated in an efficient way and how to write tests on them.
+
+The rule repository [`README.md`](./resources/README.md) links this documentation folder.

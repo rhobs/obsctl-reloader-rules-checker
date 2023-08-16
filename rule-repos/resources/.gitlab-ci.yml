@@ -1,0 +1,30 @@
+# TODO:
+# - Eventually replace 'checks-and-tests' occurences by 'checks' if there is no unit test
+# - Remove this comment once done
+stages:
+  - checks-and-tests
+
+image:
+  # TODO: replace 'latest' with a fixed version of 'obsctl-reloader-rules-checker' & remove this comment
+  name: quay.io/rhobs/obsctl-reloader-rules-checker:latest
+  entrypoint: [""]
+
+checks-and-tests:
+  only:
+    - merge_requests
+  stage: checks-and-tests
+  tags:
+    - docker
+  script:
+    # TODO <adapt-if-template>
+    # Choose the right call to 'obsctl-reloader-rules-checker':
+    # - Regarding whether or not a template needs to be generated
+    # - Regarding whether or not uni tests are present
+    # - Replace <tenant> keyword with the rule repo tenant / base tenant
+    # - Adapts the various paths if needed
+    # - Remove this comment once done
+
+    - obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -T test
+    #- obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -g template.yaml --no-uncommitted-template -T test
+    #- obsctl-reloader-rules-checker -t <tenant> -d rules -y -p
+    #- obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -g template.yaml --no-uncommitted-template

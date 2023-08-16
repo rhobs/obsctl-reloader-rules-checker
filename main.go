@@ -575,9 +575,11 @@ const longDesc = `Perform the following checks on the rules to make sure that th
 - Check that all rule files store 'PrometheusRule' objects.
 - Check that the names of all those objects are valid and unique.
 - Check the spec part of those objects with 'promtool check rules'.
-- Check that the objects spec.groups comply with RHOBS specific requirements.
-- If --gen-template flag is not set:
-  - Check that the names given to those objects starts with the given tenant (--tenant flag).
+- Check that the objects spec.groups comply with the following requirements:
+  - Evaluation interval is set for all groups.
+  - Groups have unique names.
+- If --gen-template flag is not set and if --tenant flag is set, additional RHOBS specific checks are performed:
+  - Check that the names given to those objects starts with the given tenant.
   - Check that those objects define a 'tenant' label set to the given tenant. 
 - If --gen-template flag is set:
   - Make sure that the objects in the given directory do not set a 'tenant' label
@@ -612,7 +614,7 @@ const rulesDirFlagDesc = `path to the directory containing the rule files
   - The checks fails if the directory contains files other than rule files.
   Defaults to the current working directory ('.').`
 const tenantFlagDesc = `the tenant targeted by the given rules
-  Flag is mandatory unless --gen-template is set in which case it is optional.`
+  RHOBS specific checks are by-passed if this flag is not set.`
 const yamlLintFlagDesc = "run 'yamllint' on the rule files and the unit tests"
 const pintFlagDesc = "run 'pint' on the 'spec' part of the rule files"
 const genTemplateFlagDesc = "path to the template to generate"
@@ -657,11 +659,6 @@ func main() {
 			}
 
 			if templatePath == "" {
-				if givenTenant == "" {
-					cmd.PrintErrln("--tenant flag is mandatory when --gen-template flag is not set")
-					exitOnErroneousUsage()
-				}
-
 				if isExpectingCommittedTemplate {
 					cmd.PrintErrln("--no-uncommitted-template flag cannot be set when --gen-template flag is not set")
 					exitOnErroneousUsage()

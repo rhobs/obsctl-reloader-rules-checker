@@ -1,0 +1,30 @@
+name: pr-checks
+
+on:  # yamllint disable-line rule:truthy
+  pull_request:
+
+# TODO:
+# - Eventually replace 'checks-and-tests' occurences by 'checks' if there is no unit test
+# - Remove this comment once done
+
+jobs:
+  checks-and-tests:
+    runs-on: ubuntu-latest
+    container:
+      # TODO: replace 'latest' with a fixed version of 'obsctl-reloader-rules-checker' & remove this comment
+      image: quay.io/rhobs/obsctl-reloader-rules-checker:latest
+    steps:
+      - name: checks-and-tests
+
+        # TODO <adapt-if-template>
+        # Choose the right call to 'obsctl-reloader-rules-checker':
+        # - Regarding whether or not a template needs to be generated
+        # - Regarding whether or not uni tests are present
+        # - Replace <tenant> keyword with the rule repo tenant / base tenant
+        # - Adapts the various paths if needed
+        # - Remove this comment once done
+
+        run: obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -T test
+        #run: obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -g template.yaml --no-uncommitted-template -T test
+        #run: obsctl-reloader-rules-checker -t <tenant> -d rules -y -p
+        #run: obsctl-reloader-rules-checker -t <tenant> -d rules -y -p -g template.yaml --no-uncommitted-template

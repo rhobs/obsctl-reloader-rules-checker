@@ -57,9 +57,10 @@ This tool is used to assess the validity of rule files.
 Imagine you have a repository containing rules definitions structured as follows:
 
 ```
-my-tenant_repo_clone/
-├── .yamllint
+my-tenant-rhobs-rules-clone/
 ├── .git/
+├── .yamllint
+├── Makefile
 ├── rules/
 │   ├── rule1.yaml
 │   ├── rule2.yaml
@@ -67,21 +68,21 @@ my-tenant_repo_clone/
 ├── tests/
 │   ├── test1.yaml
 │   └── test2.yaml
-└── template/
+└── template.yaml
 ```
 
-This repository only contains the rules for a single RHOBS tenant, this tenant is named `my-tenant` in above example.
+In this example the repository contains the rules for the tenant named `my-tenant`.
 
 As this tenant may differ a bit between prod and staging, we are gonna call the tool in such a way that it will generate a template; the template gather all the rules and allows to define the exact tenant through the `TENANT` parameter when instantiated.
 
 Let's assume that you are at the root of the clone; you will have to call the tool as follows on Linux/Mac:
 - When using the tool binary:
   ```
-  obsctl-reloader-rules-checker -t my-tenant -d rules -g template/template.yaml -T tests -y
+  obsctl-reloader-rules-checker -t my-tenant -d rules -g template.yaml -T tests -y
   ```
 - When using the tool docker image:
   ```
-  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template/template.yaml -T tests -y
+  docker run -v "$(pwd):/work" -t quay.io/rhobs/obsctl-reloader-rules-checker:latest -t my-tenant -d rules -g template.yaml -T tests -y
   ```
   (replace `docker` container engine by `podman` if needed)
 
@@ -94,7 +95,7 @@ Now lets explain the flags used in above example:
   The value passed here is just used as a default value for the template `TENANT` parameter.
 - The `-d` flag locates the directory in which the rules are located.
 - The `-g` flag tells to generate a template and gives the path to the file to generate.
-- The `-t` flag gives the path to the unittests directory.
+- The `-T` flag gives the path to the unittests directory.
 - The `-y` flag tells to run `yamllint` on all the rule files and on all the unittests.  
   Remark that the `.yamllint` at the root of the clone repository is telling how those YAML files should be formatted. This file is optional when using the docker image; indeed the tool docker image is bundling a default `yamllint` config file defined [there](./.yamllint).
 
@@ -182,6 +183,37 @@ The difference between the 2 commands are that:
 make clean
 ```
 This will remove the `bin` folder in which the tool binary has been delivered but also the `.bingo` folder which was used to build `promtool` & `pint`.
+
+## Contributing
+
+You have to perform the following checks prior sending your code in a PR:
+- Run `make pr-checks`: this will build the code and make sure it passes all linters.  
+  More details on that in [the previous section](#local-developement).
+- Make sure your commit messages follow the [Conventional Commits specification](https://www.conventionalcommits.org/en/v1.0.0/#summary) as this will be checked by the CI.  
+  You can check that locally by installing a hook on your repository clone; see below.
+
+**Installing a hook to check commit messages**:
+- Install `pre-commit` tool if not already done.  
+  This is platform specific, refer to the [tool documentation](https://pre-commit.com/#installation) for instructions.
+- Run the following command:  
+  ```
+  pre-commit install --hook-type commit-msg
+  ```
+
+The hook is only installed on your repository clone.
+You my want to remove it when performing some advanced operations, see below instructions. 
+
+**Uninstalling the hook checking commit messages**:
+- Run the following command:
+  ```
+  pre-commit uninstall --hook-type commit-msg
+  ```
+- Or just:
+  ```
+  rm .git/hooks/commit-msg
+  ```
+
+
 
 ## Delivering the code
 

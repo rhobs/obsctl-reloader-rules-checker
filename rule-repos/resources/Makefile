@@ -1,63 +1,43 @@
 SHELL=/usr/bin/env bash -o pipefail
 
-TAG?=$(shell git rev-parse --short HEAD)
-VERSION=$(shell cat VERSION | tr -d " \t\n\r")
+# Runtime CLI to use for running images
+CONTAINER_ENGINE ?= $(shell command -v podman 2>/dev/null || echo docker)
+# TODO: replace 'latest' with a fixed version of 'obsctl-reloader-rules-checker' & remove this comment
+IMG_VERSION=latest
 
-NO_INSTALL ?= 0
-export NO_INSTALL
+# TODO:
+# - Replace <tenant> keyword with the rule repo tenant / base tenant
+# - Make sure the '-d' flag locates the rules folder in the repository 
+# - Remove this comment once done
 
-GOOS?=$(shell go env GOOS)
-GOARCH?=$(shell go env GOARCH)
-GO111MODULE?=auto
-GOPROXY?=http://proxy.golang.org
-export GO111MODULE
-export GOPROXY
+BASE_CMD=$(CONTAINER_ENGINE) run -v "$(shell pwd):/work" --rm --privileged -t quay.io/rhobs/obsctl-reloader-rules-checker:$(IMG_VERSION) -t <tenant> -d rules -y -p
 
-TOOLS_DIR ?= $(shell pwd)/tmp/bin
-TOOLS_BIN=$(TOOLS_DIR)/yq $(TOOLS_DIR)/promtool
+# TODO <adapt-if-template>:
+# - Uncomment below instruction if a template needs to be generated
+# - Remove below commented instruction iotherwise
+# - Eventually adapt the path to the template (value of the '-g' flag)
+# - Remove this comment once done
 
-.PHONY: all
-all: clean gen-rules-templates check-rules test-rules yaml-lint
+#BASE_CMD:=$(BASE_CMD) -g template.yaml
 
-.PHONY: test
-test: check-rules test-rules yaml-lint check-rules-templates-are-committed
+# TODO:
+# - Remove below target if there is no unit test
+# - Make sure the '-T' flag locates the unit tests folder in the repository 
+# - Remove this comment once done
+.PHONY: checks-and-tests
+checks-and-tests:
+	$(BASE_CMD) -T test
 
-.PHONY: clean
-clean:
-	rm -rf tmp
+.PHONY: checks
+checks:
+	$(BASE_CMD)
 
-.PHONY: check-rules
-check-rules: get-tooling
-	hack/check-rules.sh | tee "tmp/$@.out"
+# TODO <adapt-if-template>:
+# - Uncomment below target if a template needs to be generated
+# - Remove below commented target otherwise
+# - Eventually make sure the '-T' flag locates the unit tests folder in the repository, remove it if there are no unit tests
+# - Remove this comment once done
 
-.PHONY: test-rules
-test-rules: get-tooling
-	hack/test-rules.sh | tee "tmp/$@.out"
-
-.PHONY: test-changed-rules
-test-changed-rules: get-tooling
-	hack/test-changed-rules.sh | tee "tmp/$@.out"
-
-.PHONY: gen-rules-templates
-gen-rules-templates: get-tooling
-	hack/gen-rules-template.sh hypershift-platform
-
-.PHONY: check-rules-templates-are-committed
-check-rules-templates-are-committed: gen-rules-templates
-	@! (git status -s | grep -q 'template\.yaml$$') || (echo 'Some generated templates are not committed:'; git status; exit 1)
-
-.PHONY: get-tooling
-get-tooling: $(TOOLS_BIN)
-
-$(TOOLS_DIR):
-	mkdir -p $(TOOLS_DIR)
-
-
-$(TOOLS_BIN): $(TOOLS_DIR)
-	@echo Installing tools from hack/tools.go
-	@hack/install-tools.sh
-
-.PHONY: yaml-lint
-yaml-lint:
-	@echo Linting yaml files in rules/ and test/
-	hack/yaml-lint.sh
+##.PHONY: ci
+#ci:
+# 	$(BASE_CMD) --no-uncommitted-template -T test

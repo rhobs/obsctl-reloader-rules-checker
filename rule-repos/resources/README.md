@@ -1,15 +1,23 @@
-#   Rules and dashboards
+<!--
+  TODO:
+  - Replace <tenant> keyword with the rule repo tenant / base tenant in this document
+  - Remove this comment once done
+-->
+#   <tenant> RHOBS rules
 
-This repository contains 2 kinds of resources:
-- In the `rules` folder: **the `PrometheusRule` resources uploaded on RHOBS clusters**.  
-- In the `dashboards` folder: **the dashboards configs uploaded on app-sre clusters**.
-  - `ConfigMap` resources are used to store those configs.
-  - Those dashboards consumes metrics uploaded on the `osd` tenant of RHOBS.  
-    Hence there are designed to work with the rules in `rules/osd` folder.
+This repository contains the rules for the `<tenant>` tenant.
 
-The other folders (`hack`, `docs` and `test`) are pretty self explanatory. As usual/by convention, the `hack` folder contains utility scripts for testing and the CI/CD.
+<!--
+  TODO: Remove below sentence if the repository is not hosted on GitLab
+-->
+In GitLab, you can identify the rules for the other RHOBS tenants [by filtering the repositories](https://gitlab.cee.redhat.com/explore/projects/topics/rhobs-rules) with the `rhobs-rules` topic.
 
-##  Running the tests
+<!--
+  TODO:
+  - Rename below paragraph to 'Running the checks' if there is no unit test
+  - Remove this comment once done
+-->
+##  Running the checks and the tests
 
 Just run the bellow command:
 ```
@@ -17,65 +25,113 @@ make
 ```
 
 This command will:
-- Generate the template file aggregating rules.  
-  (only for the `hypershift-platform` tenant, more details on that [here](rules/hypershift-platform/README.md))
-- Check the rules syntax with `promtool check rules`.
-- Test the rules with `promtool test rules` (tests in [`test/rules`](test/rules) folder).
-- Run yaml linter for all `.yaml` files in the repository.
+- Check the [rules](./rules/) syntax with `promtool check rules`.
+<!--
+  TODO <adapt-if-template>:
+  - Uncomment below bullet if a template needs to be generated
+  - Remove below commented bullet otherwise
+  - Remove this comment once done
+-->
+<!-- - Generate the [template file](./template.yaml) aggregating the rules. -->
+<!--
+  TODO:
+  - Remove below bullet if there is no unit test
+  - Remove this comment once done
+-->
+- Run the rules [unit tests](./test/) with `promtool test rules`.
+<!--
+  TODO:
+  - Inline to have one sentence if there is only one bullet remaining
+  - Remove this comment once done
+-->
 
-**Once this command finishes, make sure to commit the generated tempplate(s)** and ship them in your MR (Merge Request).
+<!--
+  TODO <adapt-if-template>:
+  - Uncomment below sentence if a template needs to be generated
+  - Remove below commented sentence otherwise
+  - Remove this comment once done
+-->
+<!-- **Once this command finishes, make sure to ship the generated template with your commit.** -->
 
-Each above step can also be run separaty running the following commands; respectively:
-- `make gen-rules-templates`
-- `make check-rules`
-- `make test-rules`
-- `make yaml-lint`
+<!--
+  TODO:
+  - Remove below paragraph if there is no unit test
+  - Remove this comment once done
+-->
+## Just running the checks
 
-As `test-rules` target may take quite some time, it is also possible to only run the tests that have been changed (i.e which are not yet committed) with the following command:
+Running the unit tests may take quite some time; it is possible to by-pass them by running the following command:
 ```
-make test-changed-rules
+make checks
 ```
 
-Finally remark that the GitLab build will run this command:
+<!--
+  TODO <adapt-if-template>:
+  - Uncomment below paragraph if a template needs to be generated
+  - Remove below commented paragraph otherwise
+  - Remove this comment once done
+-->
+<!-- ## Making sure your change will pass the CI
+
+The continous integration (CI) is also checking that the template matches the rules it is generated from.
+
+Run the following command to perform this additional check on top of `make`:
 ```
-make test
+make ci
 ```
 
-This command performs the same steps than the `make` command except that it will fail if the generated templates have not been committed.
-Run it as well prior creating your MR to make sure the build will succeed. 
+This additional check will make sure there is no difference between the template which has been regenerated from the rules and the template which has been committed.
+
+Run this command prior shiping your change to make sure it will pass the CI.  -->
 
 ##  Promoting the changes
 
-The `PrometheusRule` and `ConfigMap` resources (declared in `rules` and `dashboards` directories) are consumed (on a directory basis) by `app-interface` there:  
-[`data/services/osd-operators/cicd/saas/saas-rhobs-rules-and-dashboards.yaml`](https://gitlab.cee.redhat.com/service/app-interface/-/blob/master/data/services/osd-operators/cicd/saas/saas-rhobs-rules-and-dashboards.yaml)
+<!--
+  TODO:
+  - Replace <saas-name> with the service name in app-interface
+  - Make sure 'rules' link really locates the rules folder; adapt if needed
+  - Remove this comment once done
+-->
+The `PrometheusRule` in the [rules](./rules/) folder are consumed by `app-interface` there:  
+[`data/services/osd-operators/cicd/saas/<saas-name>.yaml`](https://gitlab.cee.redhat.com/service/app-interface/-/blob/master/data/services/osd-operators/cicd/saas/<saas-name>.yaml)
 
-You have to bump the `ref` attribute of the corresponding target to promote the referenced directory.
-- For instance: [MR 57223](https://gitlab.cee.redhat.com/service/app-interface/-/merge_requests/57223)
-- The new value has to be a commit hash of the `rhobs-rules-and-dashboards` repository to promote.
+You have to bump the `ref` attribute for the production target.
+The new value has to be the hash of your change last commit or the hash of the descendant commit.
 
-As you can see, the `ref` attribute can also be set to a branch name.
-That's the case for `stage` targets for which the attribute is set to `main`.  
-**Promotion is not needed on staging, changes are consumed and deployed as soon as your MR is merged on the `main` branch.**
+You can automate the `app-interface` MR creation with [`promote.sh`](https://github.com/openshift/ops-sop/blob/master/v4/utils/promote.sh) as follows:
+```
+promote.sh <saas-name>
+```
+
+<!--
+  TODO:
+  - Make sure that the default branch is really named `main`; adapt if needed
+  - Remove this comment once done
+-->
+Remark that promotion only applies to the production target.
+`ref` is set to `main` on staging; your change is automatically promoted & deployed when merging your change on that branch.
 
 ##  What about building or delivering?
 
 No binary is produced from this repository.  
-The only "deliverables" which are produced are the rule templates; those are internal deliverables as they need to be committed with your change (or GitLab build will fail).
+<!--
+  TODO <adapt-if-template>:
+  - Uncomment below sentence if a template needs to be generated
+  - Remove below commented sentence otherwise
+  - Eventually adapt the link to the template file
+  - Remove this comment once done
+-->
+<!-- The only "deliverable" is the [template file](./template.yaml) which needs to be committed with your change or the CI build will fail.
 
-As a reminder, you have to run one of the following command to generate those files:
+As a reminder, you have to run one of the following command to generate it:
 ```
 make
-make gen-rules-templates
-```
+make checks
+``` -->
 
-## You want to know more?
+## Want to know more?
 
-Take a look at the [documentation](docs).
+Take a look at the following documents:  
+https://github.com/rhobs/obsctl-reloader-rules-checker/tree/main/rule-repos/docs
 
-More specifically, you may want to take a look at the following documents when dealing with rules and Hypershift in mind:
-- [An introduction to the Hypershift monitoring architecture](docs/rules/hypershift-monitoring-architecture-introduction.md)
-- [Designing rules and writing tests](docs/rules/designing-rules-and-writing-tests.md)
-- [Troubleshooting the deployment pipeline](docs/rules/troubleshooting-the-deployment-pipeline.md)
-- Preliminary studies used to infer the definitive solution:
-  - [Google drive folder (Orange team)](https://drive.google.com/drive/folders/1Yn2fqMoM8_Xy7OfjjRlulxvnM0G7vVsz)
-  - [GitHub openshift/enhancements study](https://github.com/openshift/enhancements/blob/master/enhancements/monitoring/hypershift-monitoring.md)
+Those documents are common to all repositories hosting RHOBS rules and using `obsctl-reloader-rules-checker` tool for local testing and the CI (continuous Integration).

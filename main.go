@@ -152,10 +152,6 @@ func loadYamlAsPrometheusRule(ruleFilePath string) (*genericObj, error) {
 		return nil, fmt.Errorf("not a '%s' object", promRuleKind)
 	}
 
-	if obj.APIVersion != promRuleAPIVersion {
-		return nil, fmt.Errorf("'apiVersion' not set to '%s'", promRuleAPIVersion)
-	}
-
 	return &obj, nil
 }
 
@@ -277,8 +273,12 @@ func checkRules(rulesDirPath, tenant string, isGeneratingTemplate bool) {
 	objNameToFilePath := make(map[string]string)
 	groupNameToFilePath := make(map[string]string)
 
-	visitDir(rulesDirPath, wrapWithLogging(wrapWithRuleFileNameChecks(isGeneratingTemplate, wrapWithRulePreChecks(
+	visitDir(rulesDirPath, wrapWithLogging(wrapWithRuleFileNameChecks(isGeneratingTemplate || tenant == "", wrapWithRulePreChecks(
 		func(ruleFilePath string, obj *genericObj, specFilePath string) error {
+			if tenant != "" && obj.APIVersion != promRuleAPIVersion {
+				return fmt.Errorf("'apiVersion' not set to '%s'", promRuleAPIVersion)
+			}
+
 			objName := obj.Metadata.Name
 
 			if otherFilePath, isAlreadyUsed := objNameToFilePath[objName]; isAlreadyUsed {
@@ -572,7 +572,7 @@ func runTests(testsDirPath, rulesDirPath string) {
 const longDesc = `Perform the following checks on the rules to make sure that they can be consumed by obsctl-reloader:
 
 - Eventually check that the given directory (--rules-dir flag) only stores rule files (see flag description).
-- Check that all rule files store 'PrometheusRule' objects.
+- Check that all rule files store 'PrometheusRule' objects (but 'apiVersion' is only checked if --tenant is set).
 - Check that the names of all those objects are valid and unique.
 - Check the spec part of those objects with 'promtool check rules'.
 - Check that the objects spec.groups comply with the following requirements:
@@ -605,11 +605,11 @@ Similarly make sure 'yamllint' or 'pint' are installed when using the linter fla
 const rulesDirFlagDesc = `path to the directory containing the rule files
   Only '.yaml' and '.yml' suffixed files are considered as rule files.
   Unit test (i.e. files suffixed by '_test.yaml' or '_test.yml') are not considered as rule files.
-  If a template is generated (--gen-template flag set): 
+  If a template is generated (--gen-template flag set) or if no tenant is specified (flag --tenant not set): 
   - Non rule files are ignored.
     (Remark that --rules-dir an  --tests-dir flags may have the same value in that case)
   - Directory is walked recursively.
-  If no template is generated:
+  Otherwise, if no template is generated but the tenant is set:
   - Directory is not walked recursively.
   - The checks fails if the directory contains files other than rule files.
   Defaults to the current working directory ('.').`

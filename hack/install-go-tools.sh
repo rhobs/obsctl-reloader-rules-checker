@@ -9,6 +9,8 @@ fi
 
 cd "$(dirname $BASH_SOURCE)/.."
 
+go install -mod=readonly github.com/bwplotka/bingo@latest
+
 # The following PR has been merged in bingo:
 # https://github.com/bwplotka/bingo/pull/142
 # Once the new bingo version is released, make sure to append '-t 0' in below commands

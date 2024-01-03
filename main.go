@@ -306,6 +306,10 @@ func checkRules(rulesDirPath, tenant string, isGeneratingTemplate bool) {
 				return fmt.Errorf("failed to run 'promtool check rules' on the 'spec' part of the file; output:\n%v", output)
 			}
 
+			if output, err := runAndOutputCommand("po-lint", specFilePath); err != nil {
+				return fmt.Errorf("failed to run 'po-lint' on the file; output:\n%v", output)
+			}
+
 			{
 				var ruleGroupsObj ruleGroupsObj
 

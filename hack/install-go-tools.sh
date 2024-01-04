@@ -16,20 +16,19 @@ OS_ARCH="${OS}-${ARCH}"
 
 PROMETHEUS_VERSION="v2.48.0"
 
-TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'prometheus')
+DOWNLOAD_TMP_FOLDER=$(mktemp -d 2>/dev/null || mktemp -d -t 'prometheus')
 PROMETHEUS_DEST="$(go env GOPATH)/bin"
 RELEASE_INFO=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/tags/$PROMETHEUS_VERSION)
 FILENAME=$(echo -E "$RELEASE_INFO" | jq -r --arg os_arch "$OS_ARCH" '.assets[] | select(.name | contains($os_arch)) | .name')
 FILENAME_WITHOUT_EXTENSION="${FILENAME%.*.*}"
 DOWNLOAD_URL=$(echo -E "$RELEASE_INFO" | jq -r --arg os_arch "$OS_ARCH" '.assets[] | select(.name | contains($os_arch)) | .browser_download_url')
-(cd "$TMPDIR" && wget "$DOWNLOAD_URL" && tar -xzf "$FILENAME" && mv "$FILENAME_WITHOUT_EXTENSION"/promtool ${PROMETHEUS_DEST})
-rm -rf "$TMPDIR"
+(cd "$DOWNLOAD_TMP_FOLDER" && wget "$DOWNLOAD_URL" && tar -xzf "$FILENAME" && mv "$FILENAME_WITHOUT_EXTENSION"/promtool "$PROMETHEUS_DEST")
+rm -rf "$DOWNLOAD_TMP_FOLDER"
 
 go install -mod=readonly github.com/bwplotka/bingo@latest
 
 # The following PR has been merged in bingo:
 # https://github.com/bwplotka/bingo/pull/142
 # Once the new bingo version is released, make sure to append '-t 0' in below commands
-unset GOFLAGS
 bingo get -v -l github.com/cloudflare/pint/cmd/pint@v0.44.1
-go install github.com/prometheus-operator/prometheus-operator/cmd/po-lint
+bingo get -v -l github.com/prometheus-operator/prometheus-operator/cmd/po-lint@latest

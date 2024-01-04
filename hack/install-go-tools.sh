@@ -17,8 +17,7 @@ OS_ARCH="${OS}-${ARCH}"
 PROMETHEUS_VERSION="v2.48.0"
 
 TMPDIR=$(mktemp -d 2>/dev/null || mktemp -d -t 'prometheus')
-PROMETHEUS_DEST="/tmp/prometheus"
-mkdir -p $PROMETHEUS_DEST
+PROMETHEUS_DEST="$(go env GOPATH)/bin"
 RELEASE_INFO=$(curl -s https://api.github.com/repos/prometheus/prometheus/releases/tags/$PROMETHEUS_VERSION)
 FILENAME=$(echo -E "$RELEASE_INFO" | jq -r --arg os_arch "$OS_ARCH" '.assets[] | select(.name | contains($os_arch)) | .name')
 FILENAME_WITHOUT_EXTENSION="${FILENAME%.*.*}"

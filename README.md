@@ -120,7 +120,7 @@ Once again, the `-h` / `--help` flag is pretty explicit about those checks. Here
 - You have to checkout the code.
 - The following tools must be present on your computer:
   - `make`
-  - `go` (version 1.19 or later)
+  - `go` (version 1.20 or later)
 
 To build the binary you just have to run:
 ```
@@ -155,7 +155,7 @@ Local development is not just about building the code. It is also about making s
 - You have to checkout the code.
 - The following tools must be present on your computer:
   - `make`
-  - `go` (version 1.19 or later)
+  - `go` (version 1.20 or later)
   - a container engine: either `docker` or `podman`
   - [`yamllint`](https://github.com/adrienverge/yamllint) (eventually run `make yamllint-tool` to install the tool)
   - [`golangci-lint`](https://golangci-lint.run/usage/install/)

@@ -1,6 +1,6 @@
 module github.com/observatorium/obsctl-reloader-rules-checker
 
-go 1.20
+go 1.22
 
 require (
 	github.com/go-git/go-git/v5 v5.7.0

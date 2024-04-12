@@ -10,8 +10,8 @@ This document mainly focuses on the rules in the `rules/hypershift-platform` fol
 | --------------------------------------------------------------- | ----------- | ----------------------------- |------------------- | ------------------------------ | ----------------------------
 | [`rules/hypershift-platform`](../../rules/hypershift-platform/) | Production  | `hypershift-platform`         | `rhobsp02ue1`       | `observatorium-mst-production` | Yes
 | [`rules/hypershift-platform`](../../rules/hypershift-platform/) | Staging     | `hypershift-platform-staging` | `rhobsp02ue1`       | `observatorium-mst-production` | Yes
-| [`rules/osd`](../../rules/osd/)                                 | Production  | `osd`                         | `app-sre-stage-01`  | `observatorium-mst-stage`      | No
-| [`rules/osd`](../../rules/osd/)                                 | Staging     | `osd`                         | `telemeter-prod-01` | `observatorium-mst-production` | No
+| [`rules/osd`](../../rules/osd/)                                 | Staging     | `osd`                         | `app-sre-stage-01`  | `observatorium-mst-stage`      | No
+| [`rules/osd`](../../rules/osd/)                                 | Production  | `osd`                         | `telemeter-prod-01` | `observatorium-mst-production` | No
 
 Those differences mainly concern:
 - The way the `PrometheusRule`s are copied (through a template or not).

@@ -13,4 +13,4 @@ go install -mod=readonly github.com/bwplotka/bingo@latest
 
 unset GOFLAGS
 bingo get -v -l -t 0 github.com/prometheus/prometheus/cmd/promtool@v0.46.0
-bingo get -v -l -t 0 github.com/cloudflare/pint/cmd/pint@v0.44.1
+bingo get -v -l -t 0 github.com/cloudflare/pint/cmd/pint@244dfc72999e3d27dbb575dfff9b41d94dc2d750

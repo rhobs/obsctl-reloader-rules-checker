@@ -43,9 +43,15 @@ type genericObj struct {
 	Spec       yaml.Node
 }
 
+type ruleObj struct {
+	For   string `yaml:",omitempty"`
+	Alert string
+}
+
 type ruleGroupObj struct {
 	Name     string
 	Interval string `yaml:",omitempty"`
+	Rules    []ruleObj
 }
 
 type ruleGroupsObj struct {
@@ -329,6 +335,12 @@ func checkRules(rulesDirPath, tenant string, isGeneratingTemplate bool) {
 					// 'promtool check rules' is parsing the rules with a newer version of Prometheus in which specifying the interval at this level is now optional.
 					if ruleGroupObj.Interval == "" {
 						return fmt.Errorf("attribute 'spec.groups[].interval' is missing for some group named '%s'", ruleGroupObj.Name)
+					}
+
+					for _, ruleObj := range ruleGroupObj.Rules {
+						if ruleObj.Alert != "" && ruleObj.For == "" {
+							return fmt.Errorf("attribute 'spec.groups[].rules[].for' is missing for some alert named '%s' in group '%s'", ruleObj.Alert, ruleGroupObj.Name)
+						}
 					}
 				}
 			}
